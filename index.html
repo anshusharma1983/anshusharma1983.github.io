@@ -8,55 +8,57 @@
 <body>
 	
 	<div class="container">
-		<h1><ul class="nav nav-tabs">
+		<h2><ul class="nav nav-tabs">
 		  <li role="presentation" class="active" id="tab-publish"><a href="#">Publish</a></li>
 		  <li role="presentation" id="tab-edit"><a href="#">List</a></li>
-		</ul></h1>
-		<div class="publish-content">
-		<h1>Publish Articles</h1>
-		<form class="form-horizontal">
-			<div class="form-group">
-				<label for="author-input" class="col-sm-2 control-label">Author</label>
-				<div class="col-sm-10">
-					<input type="text" class="form-control author-input" id="author-input"/>
+		</ul></h2>
+		<div class="jumbotron">
+			<div class="publish-content">
+			<h2>Publish Articles</h2>
+			<form class="form-horizontal">
+				<div class="form-group">
+					<label for="author-input" class="col-sm-2 control-label">Author</label>
+					<div class="col-sm-10">
+						<input type="text" class="form-control author-input" id="author-input"/>
+					</div>
 				</div>
-			</div>
-			<div class="form-group">
-				<label for="title-input" class="col-sm-2 control-label">Title</label>
-				<div class="col-sm-10">
-				<input type="text" class="form-control title-input" id="title-input"/>
+				<div class="form-group">
+					<label for="title-input" class="col-sm-2 control-label">Title</label>
+					<div class="col-sm-10">
+					<input type="text" class="form-control title-input" id="title-input"/>
+					</div>
 				</div>
-			</div>
-			<div class="form-group">
-				<label for="file-input" class="col-sm-2 control-label">Upload file</label>
-				<div class="col-sm-4">
-					<input type="file" id="fileselect" class="form-control file-input" id="file-input">
+				<div class="form-group">
+					<label for="file-input" class="col-sm-2 control-label">Upload file</label>
+					<div class="col-sm-4">
+						<input type="file" id="fileselect" class="form-control file-input" id="file-input">
+					</div>
+					<div class="col-sm-4">
+						<button class="btn btn-primary" id="uploadbutton">Upload</button>
+					</div>
 				</div>
-				<div class="col-sm-4">
-					<button class="btn btn-primary" id="uploadbutton">Upload</button>
+				<div class="form-group">
+					<label for="url-input" class="col-sm-2 control-label">Article</label>
+					<div class="col-sm-10">
+					<textarea class="form-control url-input" id="url-input" rows="10"></textarea>
+					</div>
 				</div>
-			</div>
-			<div class="form-group">
-				<label for="url-input" class="col-sm-2 control-label">Article</label>
-				<div class="col-sm-10">
-				<textarea class="form-control url-input" id="url-input" rows="10"></textarea>
+				<div class="col-sm-offset-2">
+					<button class="btn btn-primary add-blog">Add</button>
 				</div>
+			</form>
 			</div>
-			<div class="col-sm-offset-2">
-				<button class="btn btn-primary add-blog">Add</button>
+			<div class="list-content" style="display:none">
+			<h1>Existing Articles</h1>
+				<table class="table">
+				<thead>
+					<th>Author</th>
+					<th>Title</th>
+					<th>Article</th>
+				</thead>
+					<tbody class="blogs-list"></tbody>
+				</table>
 			</div>
-		</form>
-		</div>
-		<div class="list-content" style="display:none">
-		<h1>Existing Articles</h1>
-			<table class="table">
-			<thead>
-				<th>Author</th>
-				<th>Title</th>
-				<th>Article</th>
-			</thead>
-				<tbody class="blogs-list"></tbody>
-			</table>
 		</div>
 	</div>
 
