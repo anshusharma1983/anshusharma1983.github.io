@@ -218,8 +218,13 @@ $(document).ready(function() {
 	});
 
 	$(".register-submit").click(function() {
+		// $("#register-form").validate();
 		var username = $("#register-email").val();
-		var password = $("#register-password").val();
+		var password = $("#password").val();
+		if (username === "" || password === ""){
+			return false;
+		}
+		
 		$.parse.signup({ 
 			  username : username, 
 			  password : password, 
@@ -241,8 +246,12 @@ $(document).ready(function() {
 	});
 
 	$(".signin-submit").click(function(){
+		// $("#signin-form").validate();
 		var username = $("#signin-email").val();
 		var password = $("#signin-password").val();
+		if (username === "" || password === ""){
+			return false;
+		}
 		$.parse.login(username, password, function(){
 			console.log("Successfully logged in");
 			loggedInUsername = username;
@@ -256,6 +265,18 @@ $(document).ready(function() {
 	$(".logout").click(function(){
 		logout();
 	});
+
+	jQuery('#register-form').validate({
+            rules : {
+                password : {
+                    minlength : 5
+                },
+                password_confirm : {
+                    minlength : 5,
+                    equalTo : "#password"
+                }
+            }
+        });
 	
 });
 
