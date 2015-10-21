@@ -1,6 +1,7 @@
 
 Backbone.Model.prototype.idAttribute = '_id';
 var fileURL="";
+var loggedInUsername="";
 $.parse.init({
     app_id : "Hb2JQX1qTc5Jf6wNqLgTXSDFvP9xgrCHVgAkfKEv", // <-- enter your Application Id here 
     rest_key : "7M16XEm4RSoagE02H1R1apFZFQkk3JNG6NLvH3XG" // <--enter your REST API Key here    
@@ -127,6 +128,10 @@ var BlogsView = Backbone.View.extend({
 		_.each(this.model.toArray(), function(blog) {
 			self.$el.append((new BlogView({model: blog})).render().$el);
 		});
+		/*$("#blogs-table").DataTable({
+			searching:false,
+			ordering:false
+		});*/
 		return this;
 	}
 });
@@ -172,6 +177,7 @@ $(function() {
   });
 
 $(document).ready(function() {
+	tryCookieLogin();
 	$('.add-blog').on('click', function() {
 		
 		var blogJSON = new Object();
@@ -189,19 +195,6 @@ $(document).ready(function() {
 		$.parse.post('Blog',blogJSON, function(json){
 		  blogsView.render();
 		});
-		/*$('.author-input').val('');
-		$('.title-input').val('');
-		$('.url-input').val('');
-		blogs.add(blog);
-		console.log("saving blog in db:" + blog.toJSON());
-		blog.save(null, {
-			success: function(response) {
-				console.log('Successfully SAVED blog with _id: ' + response.toJSON()._id);
-			},
-			error: function() {
-				console.log('Failed to save blog!');
-			}
-		});*/
 	});
 
 	$('#tab-publish').click(function() {
@@ -221,5 +214,62 @@ $(document).ready(function() {
 	    selector: "textarea",	    
 	    toolbar: "undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link"
 	});
+
+	$(".register-submit").click(function() {
+		var username = $("#register-email").val();
+		var password = $("#register-password").val();
+		$.parse.signup({ 
+			  username : username, 
+			  password : password, 
+			  email : username
+		},function(){
+			console.log("Successfully registered");
+			loggedInUsername = username;
+			$.parse.login(username, password, function(){
+				console.log("Successfully logged in");
+				postLogin(username, password);
+			}, function(){
+				console.log("Failed to login");
+			})
+		}, function(){
+			console.log("failed to register");
+		});
+	});
+
+	$(".signin-submit").click(function(){
+		var username = $("#signin-email").val();
+		var password = $("#signin-password").val();
+		$.parse.login(username, password, function(){
+			console.log("Successfully logged in");
+			loggedInUsername = username;
+			postLogin(username, password);
+		}, function(){
+			console.log("Failed to login");
+		});
+	});
+	$(".")
 });
+
+function tryCookieLogin(){
+	// $.removeCookie('login-cookie');
+	var logincookie = $.cookie('login-cookie');
+	if (logincookie) {
+		console.log('Found login cookie:' + logincookie);
+		var arr = logincookie.split(':');
+		$.parse.login(arr[0], arr[1], function(){
+			console.log("Successfully logged in");
+			loggedInUsername = arr[0];
+			postLogin(arr[0], arr[1]);
+		});	
+	}else {
+		console.log('Login cookie not found');
+	}
+}
+
+function postLogin(username, password) {
+	$(".before-login").hide();
+	$(".after-login").show();
+	$.cookie('login-cookie', username + ':' + password, {expires: 365});
+	$("a.username").html(username);
+}
 
