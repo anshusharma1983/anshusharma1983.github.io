@@ -179,7 +179,7 @@ $(function() {
 $(document).ready(function() {
 	tryCookieLogin();
 	$('.add-blog').on('click', function() {
-		
+		$("#article-form").validate();
 		var blogJSON = new Object();
 		blogJSON.author = $('.author-input').val();
 		blogJSON.title = $('.title-input').val();
@@ -192,6 +192,8 @@ $(document).ready(function() {
 			return false;
 		}
 		console.log(JSON.stringify(blogJSON));
+		var blog = new Blog(blogJSON);
+		blogs.add(blog);
 		$.parse.post('Blog',blogJSON, function(json){
 		  blogsView.render();
 		});
@@ -230,9 +232,11 @@ $(document).ready(function() {
 				postLogin(username, password);
 			}, function(){
 				console.log("Failed to login");
+				logout();
 			})
 		}, function(){
 			console.log("failed to register");
+			logout();
 		});
 	});
 
@@ -245,13 +249,17 @@ $(document).ready(function() {
 			postLogin(username, password);
 		}, function(){
 			console.log("Failed to login");
+			logout();
 		});
 	});
-	$(".")
+
+	$(".logout").click(function(){
+		logout();
+	});
+	
 });
 
 function tryCookieLogin(){
-	// $.removeCookie('login-cookie');
 	var logincookie = $.cookie('login-cookie');
 	if (logincookie) {
 		console.log('Found login cookie:' + logincookie);
@@ -271,5 +279,12 @@ function postLogin(username, password) {
 	$(".after-login").show();
 	$.cookie('login-cookie', username + ':' + password, {expires: 365});
 	$("a.username").html(username);
+	$(".author-input").val(username);
+}
+
+function logout() {
+	$(".before-login").show();
+	$(".after-login").hide();
+	$.removeCookie('login-cookie');
 }
 
