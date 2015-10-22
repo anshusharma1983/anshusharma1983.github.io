@@ -243,8 +243,11 @@ function initializeFileUpload(){
       });
     });
     tinymce.init({
+    	force_br_newlines : true,
+        force_p_newlines : false,
+        content_css : "/css/blogapp.css",
 	    selector: "textarea",	    
-	    toolbar: "undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link"
+	    toolbar: "fontselect fontsizeselect | undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link"
 	});
    }
 
