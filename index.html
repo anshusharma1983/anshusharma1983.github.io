@@ -3,19 +3,21 @@
 <head>
 	<link rel="stylesheet" href="css/bootstrap.css">
 	<link rel="stylesheet" href="css/blogapp.css">
-	<!--<link rel="stylesheet" href="css/jquery.dataTables.min.css">-->
+	<!-- <link rel="stylesheet" href="css/jquery.dataTables.min.css"> -->
+	<link rel="stylesheet" href="http://cdn.datatables.net/1.10.9/css/jquery.dataTables.min.css">
 	<meta charset="UTF-8">
 	<title>Blog app</title>	
 	<script src="js/jquery.js"></script>
 	<script src="js/underscore.js"></script>
-	<script src="js/backbone.js"></script>
+	<!--<script src="js/backbone.js"></script>-->
 	<!--<script src="js/backbone-parse.js"></script> -->
 	<script src="js/jquery.parse.js"></script>
 	<script type="text/javascript" src="http://tinymce.cachefly.net/4.2/tinymce.min.js"></script>
 	<script src="js/jquery.validate.min.js"></script>
 	<script src="js/additional-methods.min.js"></script>
 	<script src="js/jquery.cookie.js"></script>
-	<!--<script src="js/jquery.dataTables.min.js" type="text/javascript"></script>-->
+	<script src="js/bootstrap.min.js"></script>
+	<script src="js/jquery.dataTables.min.js" type="text/javascript"></script>
 	<script src="js/scripts.js"></script>
 </head>
 <body>
@@ -122,12 +124,13 @@
 			    </div>
 			</nav>
 			<div style="padding-top: 70px">
-				<h2><ul class="nav nav-tabs">
-				  <li role="presentation" class="active" id="tab-publish"><a href="#">Publish</a></li>
-				  <li role="presentation" id="tab-edit"><a href="#">List</a></li>
+				<h2><ul class="nav nav-tabs nav-justified">
+				  <li role="presentation" class="active class-tab" id="tab-publish"><a href="#">Publish</a></li>
+				  <li role="presentation" id="tab-list" class="class-tab"><a href="#">All Articles</a></li>
+				  <li role="presentation" id="tab-view" class="class-tab"><a href="#">View Articles</a></li>
 				</ul></h2>
-				<div class="jumbotron">
-					<div class="publish-content">
+				<div class="">
+					<div class="publish-content class-content">
 					<h2>Publish Articles</h2>
 					<form id="article-form" class="form-horizontal">
 						<div class="form-group">
@@ -162,16 +165,42 @@
 						</div>
 					</form>
 					</div>
-					<div class="list-content" style="display:none">
+					<div class="list-content class-content" style="display:none">
 					<h2>Existing Articles</h2>
 						<table class="table" id="blogs-table">
 						<thead>
 							<th>Author</th>
 							<th>Title</th>
-							<th>Article</th>
+							<th>View</th>
+							<th>Edit</th>
 						</thead>
 							<tbody class="blogs-list"></tbody>
 						</table>
+					</div>
+					<div class="view-content class-content" style="display:none">
+						<div class="row">
+							<div class=" viewblog-image col-md-6 col-md-offset-3">
+							</div>
+						</div>
+						<div class="row">
+							<h2><div class="viewblog-title col-md-6 col-md-offset-3">
+								
+							</div></h2>
+						</div>
+						<div class="row">
+							<div class="row viewblog-url col-md-6 col-md-offset-3" style="padding: 10px">
+								
+							</div>
+						</div>
+						<div class="row">
+							<nav>
+							  <ul class="pager">
+							    <li><a href="#">Previous</a></li>
+							    <li><a href="#">Next</a></li>
+							  </ul>
+							</nav>
+						</div>
+					
 					</div>
 				</div>
 			</div>
@@ -179,10 +208,14 @@
 	</div>
 
 	<script type="text/template" class="blogs-list-template">
-	<td><span class="author"><%= author %></span></td>
-	<td><span class="title"><%= title %></span></td>
-	<td><span class="url"><%= url %></span></td>
-	<!--<td><button class="btn btn-warning edit-blog">Edit</button> <button class="btn btn-danger delete-blog">Delete</button><button class="btn btn-success update-blog" style="display:none">Update</button> <button class="btn btn-danger cancel" style="display:none">Cancel</button></td>-->
+	<tr>
+		<td><span class="author"><%= author %></span></td>
+		<td><span class="title"><%= title %></span></td>
+		<td><span class="view"><a class="view" onclick="viewArticle(this)">view</a></span></td>
+		<td><span class="edit"><a class="edit" onclick="editArticle(this)">edit</a></span></td>
+
+		<!--<td><button class="btn btn-warning edit-blog">Edit</button> <button class="btn btn-danger delete-blog">Delete</button><button class="btn btn-success update-blog" style="display:none">Update</button> <button class="btn btn-danger cancel" style="display:none">Cancel</button></td>-->
+	</tr>
 
 	</script>
 </body>
