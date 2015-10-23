@@ -51,6 +51,25 @@ function viewArticle(obj){
 	}
 	showArticle(obj);
 }
+
+function previousArticle(){
+	console.log(currentblog);
+	if (currentblog === 0) {
+		alert("No more articles to display");	
+		return;
+	}
+	openArticle(currentblog--);
+}
+
+function nextArticle(){	
+	console.log(currentblog);
+	if (currentblog === (Object.keys(blogs).length -1)) {
+		alert("No more articles to display");
+		return;
+	}
+	openArticle(currentblog++);
+}
+
 function showArticle(obj){
 	if (obj != null) {
 		console.log("view blog :" + $(obj).closest('tr').index());	
@@ -62,6 +81,10 @@ function showArticle(obj){
 		alert("Unable to load blog");
 		return;
 	}
+	openArticle(currentblog);
+}
+
+function openArticle(id) {
 	console.log("showing blog" + currentblog);
 	var blog = blogs[currentblog];
 	$(".viewblog-image").html('<img src="' +blog.fileURL + '" style="width:100%"/>');
