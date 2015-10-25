@@ -1,8 +1,10 @@
-var pleaseWaitDiv = $('<div class="modal fade" style=top:40% id="pleaseWaitDialog" data-backdrop="static" data-keyboard="false"><div class="modal-dialog"><div class="modal-content"><div class="modal-header"><h4 class="modal-title">Processing...</h4></div><div class="modal-body"><div class="progress"><div class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%"></div></div></div></div></div></div>');
+var pleaseWaitDiv = $('<div class="modal fade" style=top:40% id="pleaseWaitDialog" data-backdrop="static" data-keyboard="false"><div class="modal-dialog"><div class="modal-content"><div class="modal-header"><h4 class="modal-title">Please wait...</h4></div><div class="modal-body"><div class="progress"><div class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%"></div></div></div></div></div></div>');
 var fileURL="";
 var loggedInUsername="";
 var currentblog = -1;
-var file;
+// var file;
+var objectId = "";
+var editblogid;
 var blogs = {}; 
 $.parse.init({
     app_id : "Hb2JQX1qTc5Jf6wNqLgTXSDFvP9xgrCHVgAkfKEv", // <-- enter your Application Id here 
@@ -23,7 +25,10 @@ function initializeTabs(){
 		$(".publish-content").show();
 		$(".class-tab").removeClass("active");
 		$('#tab-publish').addClass("active");
-				
+		$("#author-input").val(loggedInUsername);
+		$("#title-input").val('');
+		objectId = "";
+		tinyMCE.activeEditor.setContent('');
 	});
 
 	$("#tab-view").click(function(){
@@ -39,7 +44,7 @@ function initializeTabs(){
 	});
 }
 
-function viewArticle(obj){
+function viewArticle(index){
 	$(".class-content").hide();
 	$(".view-content").show();
 	$(".class-tab").removeClass("active");
@@ -49,7 +54,7 @@ function viewArticle(obj){
 		render({viewarticle : true});
 		return;
 	}
-	showArticle(obj);
+	showArticle(index);
 }
 
 function previousArticle(){
@@ -70,10 +75,10 @@ function nextArticle(){
 	openArticle(currentblog++);
 }
 
-function showArticle(obj){
-	if (obj != null) {
-		console.log("view blog :" + $(obj).closest('tr').index());	
-		currentblog = $(obj).closest('tr').index();
+function showArticle(index){
+	if (index != null) {
+		console.log("view blog :" + index);	
+		currentblog = index;
 	}else if (currentblog === -1){
 			currentblog = Object.keys(blogs).length -1;
 	}
@@ -92,8 +97,19 @@ function openArticle(id) {
 	$(".viewblog-url").html(_.unescape(blog.url));
 }
 
-function editArticle(obj){
-	console.log("edit blog :" + $(obj).closest('tr').index());	
+function editArticle(index){
+	var blog = blogs[index];
+	editblogid = index;
+	console.log("edit blog :" + index);	
+	$("#tab-publish").click();
+	objectId = blog.objectId;
+	console.log("objectId:" + objectId);
+	$("#author-input").val(blog.author);
+	$("#title-input").val(blog.title);
+	fileURL = _.unescape(blog.fileURL);
+	objectId = blog.objectId;
+	console.log("fileURL:" + fileURL);
+	tinyMCE.activeEditor.setContent(_.unescape(blog.url));
 }
 
 function render(options){
@@ -108,6 +124,7 @@ function render(options){
  			order : "-createdAt"
 		}, function(response){
 			pleaseWaitDiv.modal('hide');
+			blogs = {};
 	         	for (var i = 0; i <response.results.length; i++) {
 	         		var json = response.results[i];
 	         		blogs[Object.keys(blogs).length] = json;	         		
@@ -115,9 +132,12 @@ function render(options){
 	         	var el = $('.blogs-list');
 				var template = _.template($('.blogs-list-template').html());
 				el.html('');
-				_.each(blogs, function(blog) {
+				_.each(blogs, function(blog, index) {
 					blog.url = _.unescape(blog.url);		
-					el.append(template(blog));
+					var html = template(blog);
+					html = html.replace("editArticle(this)", "editArticle(" + index + ")");
+					html = html.replace("viewArticle(this)", "viewArticle(" + index + ")");
+					el.append(html);
 				});
 				$("#blogs-table").dataTable().fnDestroy();
 				$("#blogs-table").dataTable({
@@ -238,12 +258,24 @@ function initializeFileUpload(){
       var files = e.target.files || e.dataTransfer.files;
       // Our file var now holds the selected file
       file = files[0];
+      uploadFile(file);
     });
 
     // This function is called when the user clicks on Upload to Parse. It will create the REST API request to upload this image to Parse.
-    $('#uploadbutton').click(function() {
-      var serverUrl = 'https://api.parse.com/1/files/' + file.name;
 
+    tinymce.init({
+    	force_br_newlines : true,
+        force_p_newlines : false,
+        content_css : "/css/blogapp.css",
+	    selector: "textarea",	    
+	    plugins: "wordcount",
+	    toolbar: "fontselect fontsizeselect | undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link"
+	});
+   }
+
+   function uploadFile(file) {
+   	  var serverUrl = 'https://api.parse.com/1/files/' + file.name;
+      pleaseWaitDiv.modal('show');
       $.ajax({
         type: "POST",
         beforeSend: function(request) {
@@ -258,21 +290,14 @@ function initializeFileUpload(){
         success: function(data) {
           console.log("File available at: " + data.url);
           fileURL = data.url;
+          pleaseWaitDiv.modal('hide');
         },
         error: function(data) {
           var obj = jQuery.parseJSON(data);
           console.log(obj.error);
+          pleaseWaitDiv.modal('hide');
         }
-      });
-    });
-    tinymce.init({
-    	force_br_newlines : true,
-        force_p_newlines : false,
-        content_css : "/css/blogapp.css",
-	    selector: "textarea",	    
-	    plugins: "wordcount",
-	    toolbar: "fontselect fontsizeselect | undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link"
-	});
+      });    
    }
 
    function initializeAddBlog(){
@@ -283,18 +308,39 @@ function initializeFileUpload(){
 		blogJSON.title = $('.title-input').val();
 		blogJSON.url = _.escape(tinyMCE.activeEditor.getContent());
 		blogJSON.fileURL = _.escape(fileURL);
-		console.log("tinymce:" + tinyMCE.activeEditor.getContent());
+		// console.log("tinymce:" + tinyMCE.activeEditor.getContent());
 		
 		if (blogJSON.url === "") {
 			alert('The formatter is not ready yet');
 			return false;
 		}
-		console.log(JSON.stringify(blogJSON));
-		$.parse.post('Blog',blogJSON, function(json){
-		  alert("Data posted Successfully");
-		  blogs[Object.keys(blogs).length] = blogJSON;
-		  render();
-		});		
+		console.log("blog before publish" + JSON.stringify(blogJSON));
+		pleaseWaitDiv.modal('show');
+		if (objectId !== "") {
+			console.log("found objectId, updating existing blog");
+			$.parse.put('Blog/' + objectId, blogJSON, function(json){
+				console.log("Successfully updated the blog");
+				pleaseWaitDiv.modal('hide');
+				alert("Successfully updated the blog");
+				console.log("index:::: " + editblogid);
+				blogs[editblogid] = blogJSON;
+			}, function(){
+				alert("Error updating the blog");
+				pleaseWaitDiv.modal('hide');
+			})
+		}else {
+			console.log("No objectId, creating new blog");
+
+			$.parse.post('Blog',blogJSON, function(json){
+				pleaseWaitDiv.modal('hide');
+			  alert("Blog posted Successfully");
+			  blogs[Object.keys(blogs).length] = blogJSON;
+			  render();
+			}, function(){
+				alert("Could not upload the blog");
+				pleaseWaitDiv.modal('hide');
+			});		
+		}	
 	});
    }
 
