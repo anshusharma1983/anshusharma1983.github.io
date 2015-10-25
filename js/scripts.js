@@ -270,6 +270,7 @@ function initializeFileUpload(){
         force_p_newlines : false,
         content_css : "/css/blogapp.css",
 	    selector: "textarea",	    
+	    plugins: "wordcount",
 	    toolbar: "fontselect fontsizeselect | undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link"
 	});
    }
