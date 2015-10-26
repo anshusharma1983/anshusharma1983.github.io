@@ -135,7 +135,12 @@ function render(options){
 				_.each(blogs, function(blog, index) {
 					blog.url = _.unescape(blog.url);		
 					var html = template(blog);
-					html = html.replace("editArticle(this)", "editArticle(" + index + ")");
+					
+					if (blog.author === loggedInUsername) {
+						html = html.replace("editArticle(this)", "editArticle(" + index + ")");		
+					}else {
+						html = html.replace("<td><span class=\"edit\"><a class=\"edit\" onclick=\"editArticle(this)\">edit</a></span></td>", "<td><span class=\"edit\"></span></td>");		
+					}
 					html = html.replace("viewArticle(this)", "viewArticle(" + index + ")");
 					el.append(html);
 				});
