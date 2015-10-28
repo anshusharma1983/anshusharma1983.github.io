@@ -19,7 +19,7 @@ $(document).ready(function() {
 	initializeRegisterPage();	
 });
 
-function initializeTabs(){
+function initializeTabs() {
 	$('#tab-publish').click(function() {
 		$(".class-content").hide();
 		$(".publish-content").show();
@@ -27,6 +27,7 @@ function initializeTabs(){
 		$('#tab-publish').addClass("active");
 		$("#author-input").val(loggedInUsername);
 		$("#title-input").val('');
+		$("#url-source-input").val('');
 		objectId = "";
 		tinyMCE.activeEditor.setContent('');
 	});
@@ -106,6 +107,7 @@ function editArticle(index){
 	console.log("objectId:" + objectId);
 	$("#author-input").val(blog.author);
 	$("#title-input").val(blog.title);
+	$("#url-source-input").val(blog.source);
 	fileURL = _.unescape(blog.fileURL);
 	objectId = blog.objectId;
 	console.log("fileURL:" + fileURL);
@@ -202,6 +204,7 @@ function initializeRegisterPage(){
 		}, function(){
 			pleaseWaitDiv.modal('hide');
 			console.log("Failed to login");
+			alert("Incorrect username or password. Please try again.")
 			logout();
 		});
 	});
@@ -311,6 +314,7 @@ function initializeFileUpload(){
 		var blogJSON = {};
 		blogJSON.author = $('.author-input').val();
 		blogJSON.title = $('.title-input').val();
+		blogJSON.source = $('.url-source-input').val();
 		blogJSON.url = _.escape(tinyMCE.activeEditor.getContent());
 		blogJSON.fileURL = _.escape(fileURL);
 		// console.log("tinymce:" + tinyMCE.activeEditor.getContent());
