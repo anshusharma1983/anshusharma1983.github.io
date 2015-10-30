@@ -2,6 +2,7 @@ var pleaseWaitDiv = $('<div class="modal fade" style=top:40% id="pleaseWaitDialo
 var fileURL="";
 var loggedInUsername="";
 var currentblog = -1;
+var devmode = true;
 // var file;
 var objectId = "";
 var editblogid;
@@ -114,6 +115,26 @@ function editArticle(index){
 	tinyMCE.activeEditor.setContent(_.unescape(blog.url));
 }
 
+function deleteArticle(index) {
+	var blog = blogs[index];
+	var objectId = blog.objectId;
+	blog.deleted = true;
+	pleaseWaitDiv.modal('show');
+	$.parse.put('Blog/' + objectId, blog, function(json){
+				console.log("Successfully updated the blog");
+				pleaseWaitDiv.modal('hide');
+				alert("Successfully deleted the blog");
+				console.log("index:::: " + index);
+				blogs[index] = blog;
+				render();
+			}, function(){
+				alert("Error deleting the blog");
+				pleaseWaitDiv.modal('hide');
+	})
+}
+
+
+
 function render(options){
 	var viewarticle = false;
 	if (arguments.length == 1) {
@@ -123,35 +144,49 @@ function render(options){
 	console.log("viewarticle in render:" + viewarticle);
 	pleaseWaitDiv.modal('show');
 		$.parse.get("Blog", {
+			where : { deleted : false },
  			order : "-createdAt"
 		}, function(response){
 			pleaseWaitDiv.modal('hide');
-			blogs = {};
+				$("#blogs-table").dataTable().fnDestroy();
+				blogs = {};
 	         	for (var i = 0; i <response.results.length; i++) {
 	         		var json = response.results[i];
+	         		// console.log("setting " + Object.keys(blogs).length + ":" + i);
 	         		blogs[Object.keys(blogs).length] = json;	         		
 	         	}
 	         	var el = $('.blogs-list');
-				var template = _.template($('.blogs-list-template').html());
+	         	var template = _.template($('.blogs-list-template').html());
 				el.html('');
 				_.each(blogs, function(blog, index) {
+					// console.log("rendering:" + index + ",author:" + blog.author);
 					blog.url = _.unescape(blog.url);		
 					var html = template(blog);
-					
-					if (blog.author === loggedInUsername) {
+					if (devmode) {
 						html = html.replace("editArticle(this)", "editArticle(" + index + ")");		
-					}else {
-						html = html.replace("<td><span class=\"edit\"><a class=\"edit\" onclick=\"editArticle(this)\">edit</a></span></td>", "<td><span class=\"edit\"></span></td>");		
+						html = html.replace("deleteArticle(this)", "deleteArticle(" + index + ")");
+					} else {
+						if (blog.author === loggedInUsername) {
+							html = html.replace("editArticle(this)", "editArticle(" + index + ")");	
+							html = html.replace("deleteArticle(this)", "deleteArticle(" + index + ")");	
+						}else {
+							html = html.replace("<td><span class=\"edit\"><a class=\"edit\" onclick=\"editArticle(this)\">edit</a></span></td>", "<td><span class=\"edit\"></span></td>");
+							html = html.replace("<td><span class=\"edit\"><a class=\"delete\" onclick=\"deleteArticle(this)\">delete</a></span></td>", "<td><span class=\"delete\"></span></td>");
+						}
 					}
 					html = html.replace("viewArticle(this)", "viewArticle(" + index + ")");
 					el.append(html);
 				});
-				$("#blogs-table").dataTable().fnDestroy();
-				$("#blogs-table").dataTable({
+// data table is caching old table data somehow
+				var table = $("#blogs-table").DataTable();
+				// table.fnClearTable();	
+				table.fnDestroy();
+				// $("#blogs-table").dataTable().fnDestroy();
+				var table = $("#blogs-table").DataTable({
 					searching : false,
 					ordering : false
-
-				});	      	
+				});
+				// table.fnDraw();
 		}, function(){
 			pleaseWaitDiv.modal('hide');
 		});
@@ -251,6 +286,7 @@ function postLogin(username, password) {
 	$.cookie('login-cookie', username + ':' + password, {expires: 365});
 	$("a.username").html(username);
 	$(".author-input").val(username);
+	$("#tab-publish").click();
 }
 
 function logout() {
@@ -266,6 +302,7 @@ function initializeFileUpload(){
       var files = e.target.files || e.dataTransfer.files;
       // Our file var now holds the selected file
       file = files[0];
+      console.log("Uploading a file of size:" + file.size);
       uploadFile(file);
     });
 
@@ -339,10 +376,10 @@ function initializeFileUpload(){
 			})
 		}else {
 			console.log("No objectId, creating new blog");
-
+			blogJSON.deleted = false;
 			$.parse.post('Blog',blogJSON, function(json){
 				pleaseWaitDiv.modal('hide');
-			  alert("Blog posted Successfully");
+			  alert("Blog posted Successfully");			
 			  blogs[Object.keys(blogs).length] = blogJSON;
 			  render();
 			}, function(){
