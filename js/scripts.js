@@ -29,8 +29,12 @@ function initializeTabs() {
 		$("#author-input").val(loggedInUsername);
 		$("#title-input").val('');
 		$("#url-source-input").val('');
+		$("#tag-input").val('');
+		$("#category-input").val('CuratedBlogs');
 		objectId = "";
-		tinyMCE.activeEditor.setContent('');
+		// tinyMCE.activeEditor.setContent('');
+		tinyMCE.get('url-input').setContent('');
+		tinyMCE.get('article-input').setContent('');
 	});
 
 	$("#tab-view").click(function(){
@@ -109,10 +113,15 @@ function editArticle(index){
 	$("#author-input").val(blog.author);
 	$("#title-input").val(blog.title);
 	$("#url-source-input").val(blog.source);
+	$("#tag-input").val(blog.tag);
+	if (blog.category) {
+		$("#category-input").val(blog.category);
+	}
 	fileURL = _.unescape(blog.fileURL);
 	objectId = blog.objectId;
 	console.log("fileURL:" + fileURL);
-	tinyMCE.activeEditor.setContent(_.unescape(blog.url));
+	tinyMCE.get('url-input').setContent(_.unescape(blog.url));
+	tinyMCE.get('article-input').setContent(_.unescape(blog.article));
 }
 
 function deleteArticle(index) {
@@ -175,6 +184,9 @@ function render(options){
 						}
 					}
 					html = html.replace("viewArticle(this)", "viewArticle(" + index + ")");
+					// var date = new Date($(html).find(".created").text());
+					html = html.replace($(html).find(".created").text(), new Date($(html).find(".created").text()).toUTCString());
+					// console.log(date.toUTCString());
 					el.append(html);
 				});
 // data table is caching old table data somehow
@@ -352,7 +364,10 @@ function initializeFileUpload(){
 		blogJSON.author = $('.author-input').val();
 		blogJSON.title = $('.title-input').val();
 		blogJSON.source = $('.url-source-input').val();
-		blogJSON.url = _.escape(tinyMCE.activeEditor.getContent());
+		blogJSON.tag = $('.tag-input').val();
+		blogJSON.category = $(".category-input").val();
+		blogJSON.url = _.escape(tinyMCE.get('url-input').getContent());
+		blogJSON.article = _.escape(tinyMCE.get('article-input').getContent());
 		blogJSON.fileURL = _.escape(fileURL);
 		// console.log("tinymce:" + tinyMCE.activeEditor.getContent());
 		
