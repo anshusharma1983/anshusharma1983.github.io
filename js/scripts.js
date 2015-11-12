@@ -11,6 +11,7 @@ $.parse.init({
     app_id : "Hb2JQX1qTc5Jf6wNqLgTXSDFvP9xgrCHVgAkfKEv", // <-- enter your Application Id here 
     rest_key : "7M16XEm4RSoagE02H1R1apFZFQkk3JNG6NLvH3XG" // <--enter your REST API Key here    
 });
+Parse.initialize('Hb2JQX1qTc5Jf6wNqLgTXSDFvP9xgrCHVgAkfKEv', 'EgFafihnXb890BDerdry9f33v2QKZF8yN7veefyo');
 
 $(document).ready(function() {
 	tryCookieLogin();
@@ -397,6 +398,19 @@ function initializeFileUpload(){
 			  alert("Blog posted Successfully");			
 			  blogs[Object.keys(blogs).length] = blogJSON;
 			  render();
+			  var pushQuery = new Parse.Query(Parse.Installation);
+			  Parse.Push.send({
+				  where: pushQuery, 
+				  data: {
+				     alert: blogJSON.title
+				  }
+				}, {
+				  success: function() {
+				    console.log("Successfully pushed article");
+				  }, error: function(error) {
+				   	console.log("Couldn't push article");
+				  }
+				});
 			}, function(){
 				alert("Could not upload the blog");
 				pleaseWaitDiv.modal('hide');
