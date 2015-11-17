@@ -399,6 +399,7 @@ function initializeFileUpload(){
 			  blogs[Object.keys(blogs).length] = blogJSON;
 			  render();
 			  var pushQuery = new Parse.Query(Parse.Installation);
+			  pushQuery.equalTo('channels','create');
 			  Parse.Push.send({
 				  where: pushQuery, 
 				  data: {
