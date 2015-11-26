@@ -398,20 +398,20 @@ function initializeFileUpload(){
 			  alert("Blog posted Successfully");			
 			  blogs[Object.keys(blogs).length] = blogJSON;
 			  render();
-			  var pushQuery = new Parse.Query(Parse.Installation);
-			  pushQuery.equalTo('channels','create');
-			  Parse.Push.send({
-				  where: pushQuery, 
-				  data: {
-				     alert: blogJSON.title
-				  }
-				}, {
-				  success: function() {
-				    console.log("Successfully pushed article");
-				  }, error: function(error) {
-				   	console.log("Couldn't push article");
-				  }
-				});
+			  	// var pushQuery = new Parse.Query(Parse.Installation);
+			  	// pushQuery.equalTo('channels','create');
+			 	// Parse.Push.send({
+				//   where: pushQuery, 
+				//   data: {
+				//      alert: blogJSON.title
+				//   }
+				// }, {
+				//   success: function() {
+				//     console.log("Successfully pushed article");
+				//   }, error: function(error) {
+				//    	console.log("Couldn't push article");
+				//   }
+				// });
 			}, function(){
 				alert("Could not upload the blog");
 				pleaseWaitDiv.modal('hide');
